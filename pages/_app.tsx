@@ -3,6 +3,66 @@ import type {AppProps} from 'next/app';
 import {ChakraProvider} from '@chakra-ui/react';
 import {extendTheme} from '@chakra-ui/react';
 
+import '@rainbow-me/rainbowkit/styles.css';
+import {getDefaultWallets, RainbowKitProvider} from '@rainbow-me/rainbowkit';
+import {Chain, chain, configureChains, createClient, WagmiConfig} from 'wagmi';
+import {alchemyProvider} from 'wagmi/providers/alchemy';
+import {infuraProvider} from 'wagmi/providers/infura';
+import {jsonRpcProvider} from 'wagmi/providers/jsonRpc';
+import {publicProvider} from 'wagmi/providers/public';
+import {getDefaultProvider} from 'ethers';
+
+const alchemyId = process.env.NEXT_PUBLIC_ALCHEMY_ID || '';
+const infuraId = process.env.NEXT_PUBLIC_INFURA_KEY || '';
+
+const foundry: Chain = {
+  ...chain.localhost,
+  id: 1337,
+  name: 'Foundry',
+  rpcUrls: {
+    // default: 'https://api.avax.network/ext/bc/C/rpc',
+    default: 'https:/localhost:8545',
+  },
+  // blockExplorers: {
+  //   // default: {name: 'SnowTrace', url: 'https://snowtrace.io'},
+  // },
+};
+
+const {chains, provider} = configureChains(
+  [
+    chain.mainnet,
+    chain.polygon,
+    chain.optimism,
+    chain.arbitrum,
+    chain.polygonMumbai,
+    // chain.localhost,
+    // foundry,
+  ],
+  // [alchemyProvider({apiKey: alchemyId}), publicProvider()],
+  [infuraProvider({apiKey: infuraId})],
+  // [
+  //   jsonRpcProvider({
+  //     rpc: chain => ({
+  //       // http: `https://${chain.id}.example.com`,
+  //       http: `https://localhost:8545`,
+  //       // webSocket: `wss://${chain.id}.example.com`,
+  //     }),
+  //   }),
+  // ],
+);
+
+const {connectors} = getDefaultWallets({
+  appName: '3gram',
+  chains,
+});
+
+const wagmiClient = createClient({
+  autoConnect: true,
+  connectors,
+  // provider: getDefaultProvider(),
+  provider,
+});
+
 const colors = {
   brand: {
     900: '#1d4ed8',
@@ -15,8 +75,12 @@ const theme = extendTheme({colors});
 
 export default function App({Component, pageProps}: AppProps) {
   return (
-    <ChakraProvider theme={theme}>
-      <Component {...pageProps} />
-    </ChakraProvider>
+    <WagmiConfig client={wagmiClient}>
+      <RainbowKitProvider chains={chains} initialChain={chain.polygonMumbai}>
+        <ChakraProvider theme={theme}>
+          <Component {...pageProps} />
+        </ChakraProvider>
+      </RainbowKitProvider>
+    </WagmiConfig>
   );
 }
