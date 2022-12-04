@@ -1,5 +1,17 @@
-import {Avatar, Wrap, WrapItem} from '@chakra-ui/react';
+import {
+  Avatar,
+  Button,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalOverlay,
+  useDisclosure,
+  Wrap,
+  WrapItem,
+} from '@chakra-ui/react';
 import React from 'react';
+import {Livepeer} from './Livepeer';
 
 const Stories = ({profileData}: any) => {
   const profilePics = [
@@ -29,24 +41,40 @@ const Stories = ({profileData}: any) => {
     },
   ];
 
+  const {isOpen, onOpen, onClose} = useDisclosure();
+
   return (
-    <Wrap>
-      {profileData?.map((profile, idx) => {
-        return (
-          <WrapItem key={idx}>
-            <div className="flex flex-col items-center space-x-9">
-              <Avatar
-                className="hover:border-pink-600 hover:border-solid "
-                size="lg"
-                name="Doodles"
-                src={profilePics[idx].url}
-              />
-              <p className="flex">{profile?.handle}</p>
-            </div>
-          </WrapItem>
-        );
-      })}
-    </Wrap>
+    <>
+      <Modal onClose={onClose} isOpen={isOpen} isCentered>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalBody>
+            <Livepeer />
+          </ModalBody>
+          <ModalFooter>
+            <Button onClick={onClose}>Close</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+      <Wrap>
+        {profileData?.map((profile, idx) => {
+          return (
+            <WrapItem key={idx}>
+              <div className="flex flex-col items-center space-x-9">
+                <Avatar
+                  className="hover:border-pink-600 hover:border-solid cursor-pointer"
+                  size="lg"
+                  name="Doodles"
+                  src={profilePics[idx].url}
+                  onClick={onOpen}
+                />
+                <p className="flex">{profile?.handle}</p>
+              </div>
+            </WrapItem>
+          );
+        })}
+      </Wrap>
+    </>
   );
 };
 

@@ -13,6 +13,11 @@ import {publicProvider} from 'wagmi/providers/public';
 import {getDefaultProvider} from 'ethers';
 
 import {ApolloClient, ApolloProvider, InMemoryCache} from '@apollo/client';
+import {
+  LivepeerConfig,
+  createReactClient,
+  studioProvider,
+} from '@livepeer/react';
 
 const alchemyId = process.env.NEXT_PUBLIC_ALCHEMY_ID || '';
 const infuraId = process.env.NEXT_PUBLIC_INFURA_KEY || '';
@@ -80,13 +85,19 @@ const apolloClient = new ApolloClient({
   cache: new InMemoryCache(),
 });
 
+const livepeerClient = createReactClient({
+  provider: studioProvider({apiKey: process.env.NEXT_PUBLIC_LIVEPEER_KEY}),
+});
+
 export default function App({Component, pageProps}: AppProps) {
   return (
     <ApolloProvider client={apolloClient}>
       <WagmiConfig client={wagmiClient}>
         <RainbowKitProvider chains={chains} initialChain={chain.polygonMumbai}>
           <ChakraProvider theme={theme}>
-            <Component {...pageProps} />
+            <LivepeerConfig client={livepeerClient}>
+              <Component {...pageProps} />
+            </LivepeerConfig>
           </ChakraProvider>
         </RainbowKitProvider>
       </WagmiConfig>
