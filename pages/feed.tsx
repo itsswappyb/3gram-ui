@@ -56,7 +56,7 @@ const feed = () => {
   const router = useRouter();
 
   const {account, library, chainId} = useWeb3React();
-  const signer = library.getSigner(account);
+  const signer = library?.getSigner(account);
 
   const {isOpen, onOpen, onClose} = useDisclosure();
 
