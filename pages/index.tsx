@@ -16,41 +16,14 @@ import {useEffect, useState} from 'react';
 import {useRouter} from 'next/router';
 
 import {CONTRACT_ADDRESS} from '@utils/constants';
+import {getProfiles} from '../graphql/queries';
+import useGetHandle from '@hooks/useGetHandle';
 
 export default function Home() {
   const {address, isConnected} = useAccount();
   const {disconnect} = useDisconnect();
   const router = useRouter();
 
-  const [username, setUsername] = useState<string>('');
-
-  const {config} = usePrepareContractWrite({
-    addressOrName: CONTRACT_ADDRESS,
-    contractInterface: [
-      {
-        anonymous: false,
-        inputs: [
-          {
-            indexed: true,
-            internalType: 'address',
-            name: '_wallet',
-            type: 'address',
-          },
-          {
-            indexed: true,
-            internalType: 'string',
-            name: '_username',
-            type: 'string',
-          },
-        ],
-        name: 'CreateUser',
-        type: 'event',
-      },
-    ],
-    functionName: 'createUser',
-    args: [String(postTitle)],
-  });
-  const {data, isLoading, isSuccess, write} = useContractWrite(config);
   const hasWindow = typeof window !== 'undefined';
 
   useEffect(() => {

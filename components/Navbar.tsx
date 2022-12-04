@@ -22,12 +22,12 @@ const Navbar: React.FC = () => {
           Feed
         </Link>
 
-        <Link
+        {/* <Link
           href="/lens"
           className="text-md text-center font-bold hover:text-primary  hover:opacity-70"
         >
           Lens
-        </Link>
+        </Link> */}
 
         <Link
           href="/nfts"

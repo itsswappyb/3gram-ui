@@ -12,6 +12,8 @@ import {jsonRpcProvider} from 'wagmi/providers/jsonRpc';
 import {publicProvider} from 'wagmi/providers/public';
 import {getDefaultProvider} from 'ethers';
 
+import {ApolloClient, ApolloProvider, InMemoryCache} from '@apollo/client';
+
 const alchemyId = process.env.NEXT_PUBLIC_ALCHEMY_ID || '';
 const infuraId = process.env.NEXT_PUBLIC_INFURA_KEY || '';
 
@@ -73,14 +75,21 @@ const colors = {
 
 const theme = extendTheme({colors});
 
+const apolloClient = new ApolloClient({
+  uri: 'https://api.thegraph.com/subgraphs/name/anudit/lens-protocol',
+  cache: new InMemoryCache(),
+});
+
 export default function App({Component, pageProps}: AppProps) {
   return (
-    <WagmiConfig client={wagmiClient}>
-      <RainbowKitProvider chains={chains} initialChain={chain.polygonMumbai}>
-        <ChakraProvider theme={theme}>
-          <Component {...pageProps} />
-        </ChakraProvider>
-      </RainbowKitProvider>
-    </WagmiConfig>
+    <ApolloProvider client={apolloClient}>
+      <WagmiConfig client={wagmiClient}>
+        <RainbowKitProvider chains={chains} initialChain={chain.polygonMumbai}>
+          <ChakraProvider theme={theme}>
+            <Component {...pageProps} />
+          </ChakraProvider>
+        </RainbowKitProvider>
+      </WagmiConfig>
+    </ApolloProvider>
   );
 }

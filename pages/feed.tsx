@@ -41,7 +41,11 @@ import {CONTRACT_ADDRESS, ABI} from '@utils/constants';
 
 import {BiLike, BiChat, BiShare, BiPlus} from 'react-icons/bi';
 import saveToIPFS from '@utils/saveToIPFS';
+import {useQuery} from '@apollo/client';
+import {getProfiles} from 'graphql/queries';
 // import {Box} from 'framer-motion';
+
+import {Spinner} from '@chakra-ui/react';
 
 const feed = () => {
   const {address, isConnected} = useAccount();
@@ -56,10 +60,14 @@ const feed = () => {
   const initialRef: React.MutableRefObject<null> = useRef(null);
   const finalRef: React.MutableRefObject<null> = useRef(null);
   const fileRef: React.MutableRefObject<null> = useRef(null);
+  const [username, setUsername] = useState<string>('');
+
+  const {loading, error, data: profileData} = useQuery(getProfiles);
+  console.log('feed profiles: ', profileData);
 
   // createPost function
   // TODO: call this function
-  const {config} = usePrepareContractWrite({
+  const {config: createPostConfig} = usePrepareContractWrite({
     addressOrName: CONTRACT_ADDRESS,
     contractInterface: [
       {
@@ -84,28 +92,100 @@ const feed = () => {
     functionName: 'createPost',
     args: [String(postTitle)],
   });
-  const {data, isLoading, isSuccess, write} = useContractWrite(config);
+  const {
+    data: createPostData,
+    isLoading: createPostLoading,
+    isSuccess: createPostSuccess,
+    write: createPostWrite,
+  } = useContractWrite(createPostConfig);
 
-  useEffect(() => {
-    if (!isConnected) {
-      // disconnect();
-      router.push('/');
-    }
-  }, [isConnected]);
+  // Create User
+  const {config} = usePrepareContractWrite({
+    addressOrName: CONTRACT_ADDRESS,
+    contractInterface: [
+      {
+        inputs: [
+          {
+            internalType: 'string',
+            name: '_username',
+            type: 'string',
+          },
+          {
+            internalType: 'string',
+            name: '_name',
+            type: 'string',
+          },
+          {
+            internalType: 'string',
+            name: '_bio',
+            type: 'string',
+          },
+          {
+            internalType: 'string',
+            name: '_avatar',
+            type: 'string',
+          },
+        ],
+        name: 'createUser',
+        outputs: [],
+        stateMutability: 'nonpayable',
+        type: 'function',
+      },
+    ],
+    functionName: 'createUser',
+    args: [
+      username,
+      `${username}-${Math.floor(Math.random() * 50)}`,
+      'test bio',
+      'https://openseauserdata.com/files/22b10da7fb2cafbf2a76898f185e010f.svg',
+    ],
+  });
+  const {
+    data: createUserData,
+    isLoading: createUserLoading,
+    isSuccess: createUserSuccess,
+    write: createUserWrite,
+  } = useContractWrite(config);
 
-  const handleCreatePost = (e: Event) => {
+  const handleCreatePost = async (e: Event) => {
     e.preventDefault();
     console.log('submitting...');
     console.log('post title: ', postTitle);
     console.log('image file: ', file);
-    // TODO: post to contract + upload to IPFS
     // await saveToIPFS
+    await saveToIPFS(file);
+    // create post
+    await createPostWrite?.();
   };
+  const _profileData =
+    profileData &&
+    profileData?.profiles?.filter((profile, idx) => profile?.id !== 1);
+
+  const sixProfiles = _profileData?.slice(5);
+
+  const currentUserOnLens = sixProfiles?.filter(
+    (profile, idx) => profile.owner === address,
+  );
+
+  useEffect(() => {
+    if (!isConnected) {
+      // disconnect();
+
+      router.push('/');
+    }
+  }, [isConnected]);
+
+  useEffect(() => {
+    // createUser
+    if (!username) {
+      createUserWrite?.();
+    }
+  }, []);
 
   return (
     <Layout>
       <div className="flex justify-center">
-        <Stories />
+        <Stories profileData={sixProfiles} />
       </div>
       <Flex
         flex="1"
@@ -134,7 +214,7 @@ const feed = () => {
           <Modal
             initialFocusRef={initialRef}
             finalFocusRef={finalRef}
-            isOpen={isOpen}
+            isOpen={!createPostSuccess && !createUserSuccess ? isOpen : false}
             onClose={onClose}
           >
             <ModalOverlay />
