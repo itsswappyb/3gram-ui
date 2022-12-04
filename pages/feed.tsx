@@ -47,10 +47,16 @@ import {getProfiles} from 'graphql/queries';
 
 import {Spinner} from '@chakra-ui/react';
 
+import * as PushAPI from '@pushprotocol/restapi';
+import {useWeb3React} from '@web3-react/core';
+
 const feed = () => {
   const {address, isConnected} = useAccount();
   const {disconnect} = useDisconnect();
   const router = useRouter();
+
+  const {account, library, chainId} = useWeb3React();
+  const signer = library.getSigner(account);
 
   const {isOpen, onOpen, onClose} = useDisclosure();
 
@@ -154,6 +160,25 @@ const feed = () => {
     console.log('image file: ', file);
     // await saveToIPFS
     await saveToIPFS(file);
+    // apiResponse?.status === 204, if sent successfully!
+    const apiResponse = await PushAPI.payloads.sendNotification({
+      signer,
+      type: 3, // target
+      identityType: 2, // direct payload
+      notification: {
+        title: `[SDK-TEST] notification TITLE:`,
+        body: `[sdk-test] notification BODY`,
+      },
+      payload: {
+        title: `[sdk-test] payload title`,
+        body: `sample msg body`,
+        cta: '',
+        img: '',
+      },
+      recipients: `eip155:5:${address}`, // recipient address
+      channel: 'eip155:5:0xD8634C39BBFd4033c0d3289C4515275102423681', // your channel address
+      env: 'staging',
+    });
     // create post
     await createPostWrite?.();
   };
