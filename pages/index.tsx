@@ -2,18 +2,55 @@ import {Button} from '@chakra-ui/react';
 import Head from 'next/head';
 import Image from 'next/image';
 import styles from '../styles/Home.module.css';
-import {useAccount, useConnect, useDisconnect} from 'wagmi';
+import {
+  useAccount,
+  useConnect,
+  useDisconnect,
+  useContractWrite,
+  usePrepareContractWrite,
+} from 'wagmi';
 
 import {ConnectButton} from '@rainbow-me/rainbowkit';
 import Layout from '@components/Layout';
 import {useEffect, useState} from 'react';
 import {useRouter} from 'next/router';
 
+import {CONTRACT_ADDRESS} from '@utils/constants';
+
 export default function Home() {
   const {address, isConnected} = useAccount();
   const {disconnect} = useDisconnect();
   const router = useRouter();
 
+  const [username, setUsername] = useState<string>('');
+
+  const {config} = usePrepareContractWrite({
+    addressOrName: CONTRACT_ADDRESS,
+    contractInterface: [
+      {
+        anonymous: false,
+        inputs: [
+          {
+            indexed: true,
+            internalType: 'address',
+            name: '_wallet',
+            type: 'address',
+          },
+          {
+            indexed: true,
+            internalType: 'string',
+            name: '_username',
+            type: 'string',
+          },
+        ],
+        name: 'CreateUser',
+        type: 'event',
+      },
+    ],
+    functionName: 'createUser',
+    args: [String(postTitle)],
+  });
+  const {data, isLoading, isSuccess, write} = useContractWrite(config);
   const hasWindow = typeof window !== 'undefined';
 
   useEffect(() => {

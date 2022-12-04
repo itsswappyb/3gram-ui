@@ -1,8 +1,16 @@
 import Layout from '@components/Layout';
 import React, {useEffect, useState, useRef, MouseEventHandler} from 'react';
-import {useAccount, useConnect, useDisconnect} from 'wagmi';
+
 import {useRouter} from 'next/router';
 import Stories from '@components/Stories';
+import {
+  useAccount,
+  useConnect,
+  useDisconnect,
+  usePrepareContractWrite,
+  useContractWrite,
+} from 'wagmi';
+
 import {
   Card,
   CardHeader,
@@ -29,6 +37,8 @@ import {
   ModalFooter,
 } from '@chakra-ui/react';
 
+import {CONTRACT_ADDRESS, ABI} from '@utils/constants';
+
 import {BiLike, BiChat, BiShare, BiPlus} from 'react-icons/bi';
 import saveToIPFS from '@utils/saveToIPFS';
 // import {Box} from 'framer-motion';
@@ -46,6 +56,35 @@ const feed = () => {
   const initialRef: React.MutableRefObject<null> = useRef(null);
   const finalRef: React.MutableRefObject<null> = useRef(null);
   const fileRef: React.MutableRefObject<null> = useRef(null);
+
+  // createPost function
+  // TODO: call this function
+  const {config} = usePrepareContractWrite({
+    addressOrName: CONTRACT_ADDRESS,
+    contractInterface: [
+      {
+        inputs: [
+          {
+            internalType: 'string',
+            name: '_title',
+            type: 'string',
+          },
+          {
+            internalType: 'string',
+            name: '_media',
+            type: 'string',
+          },
+        ],
+        name: 'createPost',
+        outputs: [],
+        stateMutability: 'nonpayable',
+        type: 'function',
+      },
+    ],
+    functionName: 'createPost',
+    args: [String(postTitle)],
+  });
+  const {data, isLoading, isSuccess, write} = useContractWrite(config);
 
   useEffect(() => {
     if (!isConnected) {
@@ -105,7 +144,12 @@ const feed = () => {
               <ModalBody pb={6}>
                 <FormControl>
                   <FormLabel>Post Title</FormLabel>
-                  <Input ref={initialRef} placeholder="Post Title" />
+                  <Input
+                    ref={initialRef}
+                    value={postTitle}
+                    placeholder="Post Title"
+                    onChange={e => setPostTitle(e.target.value)}
+                  />
                 </FormControl>
 
                 <FormControl mt={4}>
