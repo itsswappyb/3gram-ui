@@ -19,6 +19,9 @@ import {
   studioProvider,
 } from '@livepeer/react';
 
+import {store as reduxStore} from '../store';
+import {Provider as ReduxProvider} from 'react-redux';
+
 const alchemyId = process.env.NEXT_PUBLIC_ALCHEMY_ID || '';
 const infuraId = process.env.NEXT_PUBLIC_INFURA_KEY || '';
 
@@ -91,15 +94,20 @@ const livepeerClient = createReactClient({
 export default function App({Component, pageProps}: AppProps) {
   return (
     <ApolloProvider client={apolloClient}>
-      <WagmiConfig client={wagmiClient}>
-        <RainbowKitProvider chains={chains} initialChain={chain.polygonMumbai}>
-          <ChakraProvider theme={theme}>
-            <LivepeerConfig client={livepeerClient}>
-              <Component {...pageProps} />
-            </LivepeerConfig>
-          </ChakraProvider>
-        </RainbowKitProvider>
-      </WagmiConfig>
+      <ReduxProvider store={reduxStore}>
+        <WagmiConfig client={wagmiClient}>
+          <RainbowKitProvider
+            chains={chains}
+            initialChain={chain.polygonMumbai}
+          >
+            <ChakraProvider theme={theme}>
+              <LivepeerConfig client={livepeerClient}>
+                <Component {...pageProps} />
+              </LivepeerConfig>
+            </ChakraProvider>
+          </RainbowKitProvider>
+        </WagmiConfig>
+      </ReduxProvider>
     </ApolloProvider>
   );
 }
