@@ -28,7 +28,7 @@ export default function Home() {
 
   useEffect(() => {
     if (isConnected) {
-      router.push('/feed');
+      router.replace('/feed');
     }
   }, [isConnected]);
 

@@ -25,7 +25,7 @@ const nfts = () => {
   useEffect(() => {
     if (!isConnected) {
       disconnect();
-      router.push('/');
+      router.replace('/');
     }
   }, [isConnected]);
 

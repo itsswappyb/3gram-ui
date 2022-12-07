@@ -105,113 +105,69 @@ const feed = () => {
     write: createPostWrite,
   } = useContractWrite(createPostConfig);
 
-  // Create User
-  const {config} = usePrepareContractWrite({
-    addressOrName: CONTRACT_ADDRESS,
-    contractInterface: [
-      {
-        inputs: [
-          {
-            internalType: 'string',
-            name: '_username',
-            type: 'string',
-          },
-          {
-            internalType: 'string',
-            name: '_name',
-            type: 'string',
-          },
-          {
-            internalType: 'string',
-            name: '_bio',
-            type: 'string',
-          },
-          {
-            internalType: 'string',
-            name: '_avatar',
-            type: 'string',
-          },
-        ],
-        name: 'createUser',
-        outputs: [],
-        stateMutability: 'nonpayable',
-        type: 'function',
-      },
-    ],
-    functionName: 'createUser',
-    args: [
-      username,
-      `${username}-${Math.floor(Math.random() * 50)}`,
-      'test bio',
-      'https://openseauserdata.com/files/22b10da7fb2cafbf2a76898f185e010f.svg',
-    ],
-  });
-  const {
-    data: createUserData,
-    isLoading: createUserLoading,
-    isSuccess: createUserSuccess,
-    write: createUserWrite,
-  } = useContractWrite(config);
-
   const handleCreatePost = async (e: Event) => {
     e.preventDefault();
-    console.log('submitting...');
-    console.log('post title: ', postTitle);
-    console.log('image file: ', file);
-    // await saveToIPFS
-    await saveToIPFS(file);
-    // apiResponse?.status === 204, if sent successfully!
-    const apiResponse = await PushAPI.payloads.sendNotification({
-      signer,
-      type: 3, // target
-      identityType: 2, // direct payload
-      notification: {
-        title: `[SDK-TEST] notification TITLE:`,
-        body: `[sdk-test] notification BODY`,
-      },
-      payload: {
-        title: `[sdk-test] payload title`,
-        body: `sample msg body`,
-        cta: '',
-        img: '',
-      },
-      recipients: `eip155:5:${address}`, // recipient address
-      channel: 'eip155:5:0xD8634C39BBFd4033c0d3289C4515275102423681', // your channel address
-      env: 'staging',
-    });
-    // create post
-    await createPostWrite?.();
+    try {
+      console.log('submitting...');
+      console.log('post title: ', postTitle);
+      console.log('image file: ', file);
+      // await saveToIPFS
+      await saveToIPFS(file);
+      // apiResponse?.status === 204, if sent successfully!
+      const apiResponse = await PushAPI.payloads.sendNotification({
+        signer,
+        type: 3, // target
+        identityType: 2, // direct payload
+        notification: {
+          title: `[SDK-TEST] notification TITLE:`,
+          body: `[sdk-test] notification BODY`,
+        },
+        payload: {
+          title: `[sdk-test] payload title`,
+          body: `sample msg body`,
+          cta: '',
+          img: '',
+        },
+        recipients: `eip155:5:${address}`, // recipient address
+        channel: 'eip155:5:0xD8634C39BBFd4033c0d3289C4515275102423681', // your channel address
+        env: 'staging',
+      });
+      console.log({apiResponse});
+      // create post
+      await createPostWrite?.();
+    } catch (err) {
+      console.log(err);
+    }
   };
+
+  type Profile = {
+    handle: string;
+    id: string;
+    owner: string;
+    profileId: string;
+    pubCount: string;
+    __typename: string;
+  };
+
   const _profileData =
     profileData &&
-    profileData?.profiles?.filter((profile, idx) => profile?.id !== 1);
-
-  const sixProfiles = _profileData?.slice(5);
-
-  const currentUserOnLens = sixProfiles?.filter(
-    (profile, idx) => profile.owner === address,
-  );
+    profileData?.profiles?.filter(
+      (profile: Profile, idx: number) => Number(profile?.id) !== 1,
+    );
 
   useEffect(() => {
     if (!isConnected) {
       // disconnect();
 
-      router.push('/');
+      router.replace('/');
     }
   }, [isConnected]);
 
-  useEffect(() => {
-    // createUser
-    if (!username) {
-      createUserWrite?.();
-    }
-  }, []);
-
   return (
     <Layout>
-      <div className="flex justify-center">
-        <Stories profileData={sixProfiles} />
-      </div>
+      <Flex justifyContent="center">
+        <Stories profileData={_profileData} />
+      </Flex>
       <Flex
         flex="1"
         gap="4"
@@ -220,10 +176,6 @@ const feed = () => {
         flexWrap="wrap"
         className="mt-12"
       >
-        {/* <Button colorScheme="messenger" className="pointer">
-          Create Post
-        </Button> */}
-
         {/* MODAL */}
         <>
           <Button
@@ -239,7 +191,7 @@ const feed = () => {
           <Modal
             initialFocusRef={initialRef}
             finalFocusRef={finalRef}
-            isOpen={!createPostSuccess && !createUserSuccess ? isOpen : false}
+            isOpen={!createPostSuccess ? isOpen : false}
             onClose={onClose}
           >
             <ModalOverlay />

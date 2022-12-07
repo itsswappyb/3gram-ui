@@ -22,25 +22,24 @@ import {
 const alchemyId = process.env.NEXT_PUBLIC_ALCHEMY_ID || '';
 const infuraId = process.env.NEXT_PUBLIC_INFURA_KEY || '';
 
-const foundry: Chain = {
-  ...chain.localhost,
-  id: 1337,
-  name: 'Foundry',
-  rpcUrls: {
-    // default: 'https://api.avax.network/ext/bc/C/rpc',
-    default: 'https:/localhost:8545',
-  },
-  // blockExplorers: {
-  //   // default: {name: 'SnowTrace', url: 'https://snowtrace.io'},
-  // },
-};
+// const foundry: Chain = {
+//   ...chain.localhost,
+//   id: 1337,
+//   name: 'Foundry',
+//   rpcUrls: {
+//     default: 'https:/localhost:8545',
+//   },
+//   blockExplorers: {
+//     default: {name: 'SnowTrace', url: 'https://snowtrace.io'},
+//   },
+// };
 
 const {chains, provider} = configureChains(
   [
-    chain.mainnet,
-    chain.polygon,
-    chain.optimism,
-    chain.arbitrum,
+    // chain.mainnet,
+    // chain.polygon,
+    // chain.optimism,
+    // chain.arbitrum,
     chain.polygonMumbai,
     // chain.localhost,
     // foundry,

@@ -11,7 +11,7 @@ const lens = () => {
   useEffect(() => {
     if (!isConnected) {
       disconnect();
-      router.push('/');
+      router.replace('/');
     }
   }, [isConnected]);
 

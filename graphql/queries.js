@@ -2,7 +2,7 @@ import {gql} from '@apollo/client';
 
 export const getProfiles = gql`
   query GetProfiles {
-    profiles(first: 10) {
+    profiles(first: 6) {
       id
       profileId
       pubCount
