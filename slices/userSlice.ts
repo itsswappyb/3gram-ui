@@ -3,9 +3,9 @@ import type {PayloadAction} from '@reduxjs/toolkit';
 
 export interface UserInterface {
   username: string;
-  name: string;
-  bio: string;
-  avatar: string;
+  name?: string;
+  bio?: string;
+  avatar?: string;
 }
 
 const initialState: UserInterface = {
@@ -25,8 +25,11 @@ export const userSlice = createSlice({
       state.bio = action.payload.bio || '';
       state.avatar = action.payload.avatar || '';
     },
+    createUsername: (state, action: PayloadAction<string>) => {
+      state.username = action.payload;
+    },
   },
 });
 
-export const {createUser} = userSlice.actions;
+export const {createUser, createUsername} = userSlice.actions;
 export default userSlice.reducer;
