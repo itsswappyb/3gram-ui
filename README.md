@@ -1,4 +1,12 @@
+# Subgraph
+
+- endpoint: `https://api.thegraph.com/subgraphs/name/itsswappyb/3g-dev`
+
 # Contract Info
+
+- Contract Address: 0x7a20b8713b7455466374406b4dfcb623b7ce7cbd
+- Hash: 0xca6b8575a176b9d0cb2d96e80d5bc08da2db5e8230fbf70e9bb580f5019ca2d4
+- Verification Link: https://mumbai.polygonscan.com/address/0x7a20b8713b7455466374406b4dfcb623b7ce7cbd
 
 - Contract Address: 0xf39697301067cfc8fbdda92c1f5e93c145a2c1a2
 - Hash: 0x5cc6fceef6a9361931f5b978debaa061e5e4711f369c6722794b7bc9d69c68ef

@@ -80,20 +80,15 @@ const CreateUser: React.FC<Props> = () => {
   ``;
 
   const isNameError = name == '';
-  const isUsernameError = name == '';
-  const isBioError = name == '';
-  const isAvatarError = name == '';
+  const isUsernameError = username == '';
+  const isBioError = bio == '';
+  const isAvatarError = avatar == '';
 
   const handleCreateUser = async (e: any): Promise<void> => {
     e.preventDefault();
     await dispatch(createUsername(username));
     try {
-      createUserWrite?.(
-        username,
-        name,
-        bio,
-        'https://openseauserdata.com/files/22b10da7fb2cafbf2a76898f185e010f.svg',
-      );
+      createUserWrite?.();
     } catch (err: any) {
       console.log(err.data.message);
     }
@@ -120,9 +115,7 @@ const CreateUser: React.FC<Props> = () => {
               }
               className="flex"
             />
-            {!isNameError ? (
-              <FormHelperText>Enter your name.</FormHelperText>
-            ) : (
+            {isNameError && (
               <FormErrorMessage>Name is required.</FormErrorMessage>
             )}
           </FormControl>
@@ -136,9 +129,7 @@ const CreateUser: React.FC<Props> = () => {
                 setName(e?.currentTarget?.value)
               }
             />
-            {!isUsernameError ? (
-              <FormHelperText>Enter your username.</FormHelperText>
-            ) : (
+            {isUsernameError && (
               <FormErrorMessage>Username is required.</FormErrorMessage>
             )}
           </FormControl>
@@ -152,9 +143,7 @@ const CreateUser: React.FC<Props> = () => {
                 setName(e?.currentTarget?.value)
               }
             />
-            {!isBioError ? (
-              <FormHelperText>Enter your Bio.</FormHelperText>
-            ) : (
+            {isBioError && (
               <FormErrorMessage>Bio is required.</FormErrorMessage>
             )}
           </FormControl>
@@ -168,9 +157,7 @@ const CreateUser: React.FC<Props> = () => {
                 setName(e?.currentTarget?.value)
               }
             />
-            {!isAvatarError ? (
-              <FormHelperText>Enter your avatar.</FormHelperText>
-            ) : (
+            {isAvatarError && (
               <FormErrorMessage>Avatar is required.</FormErrorMessage>
             )}
           </FormControl>
